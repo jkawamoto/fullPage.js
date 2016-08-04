@@ -346,7 +346,16 @@
         * Moves the page up one section.
         */
         FP.moveSectionUp = function(){
-            var prev = $(SECTION_ACTIVE_SEL).prev(SECTION_SEL);
+            var active = $(SECTION_ACTIVE_SEL).get(0);
+            var sections = $.makeArray($(SECTION_SEL));
+            var prevIdx = -1 + sections.findIndex(function(e){
+                return e === active;
+            });
+            
+            var prev = [];
+            if (prevIdx >= 0 && prevIdx < sections.length){
+                prev = $(sections[prevIdx]);
+            }
 
             //looping to the bottom if there's no more sections above
             if (!prev.length && (options.loopTop || options.continuousVertical)) {
@@ -362,7 +371,16 @@
         * Moves the page down one section.
         */
         FP.moveSectionDown = function (){
-            var next = $(SECTION_ACTIVE_SEL).next(SECTION_SEL);
+            var active = $(SECTION_ACTIVE_SEL).get(0);
+            var sections = $.makeArray($(SECTION_SEL));
+            var nextIdx = 1 + sections.findIndex(function(e){
+                return e === active;
+            });
+
+            var next = [];
+            if (nextIdx > 0 && nextIdx < sections.length){
+                next = $(sections[nextIdx]);
+            }
 
             //looping to the top if there's no more sections below
             if(!next.length &&
@@ -1319,7 +1337,7 @@
 
             //is the destination element bigger than the viewport?
             if(element.outerHeight() > windowsHeight){
-                //scrolling up? 
+                //scrolling up?
                 if(!isScrollingDown && !bigSectionsDestination || bigSectionsDestination === 'bottom' ){
                     position = sectionBottom;
                 }
@@ -1392,7 +1410,8 @@
 
             stopMedia(v.activeSection);
 
-            element.addClass(ACTIVE).siblings().removeClass(ACTIVE);
+            $(SECTION_SEL).removeClass(ACTIVE);
+            element.addClass(ACTIVE);
             lazyLoad(element);
             options.scrollOverflowHandler.onLeave();
 
@@ -2835,8 +2854,8 @@
          */
         isScrolled: function(type, scrollable) {
             var scroller = scrollable.data('iscrollInstance');
-            
-            //no scroller? 
+
+            //no scroller?
             if (!scroller) {
                 return true;
             }
